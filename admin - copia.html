@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>SISTEMA INTERNO | Ladran Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .sidebar { height: 100vh; background: #2c3e50; color: white; padding: 20px; position: fixed; width: 250px; }
+        .main-content { margin-left: 250px; padding: 40px; }
+        .card-data { background: white; border-radius: 15px; border: none; }
+        .table thead { background: #f8f9fa; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h3 class="fw-bold mb-4">LADRAN ADMIN</h3>
+        <hr>
+        <p class="small text-uppercase text-secondary">Base de Datos</p>
+        <nav class="nav flex-column">
+            <a class="nav-link text-white active" href="#"><i class="fas fa-list me-2"></i> Todas las Citas</a>
+            <a class="nav-link text-white" href="index.html"><i class="fas fa-external-link-alt me-2"></i> Ver Web</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Gestión de Clientes</h2>
+            <button class="btn btn-danger btn-sm" onclick="borrarTodo()">Limpiar Historial</button>
+        </div>
+
+        <div class="card card-data shadow-sm p-4">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Dueño</th>
+                            <th>Mascota</th>
+                            <th>Tamaño</th>
+                            <th>Servicio Solicitado</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Control</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaAdmin">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cargarDatos() {
+            const db = JSON.parse(localStorage.getItem('reservas')) || [];
+            const tbody = document.getElementById('tablaAdmin');
+            tbody.innerHTML = '';
+            
+            if(db.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted">No hay citas registradas actualmente.</td></tr>';
+                return;
+            }
+
+            db.forEach((item, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="fw-bold">${item.cliente}</td>
+                        <td>${item.perrito}</td>
+                        <td><span class="badge rounded-pill bg-secondary text-white">${item.tamaño}</span></td>
+                        <td><span class="badge bg-primary">${item.servicio}</span></td>
+                        <td>${item.fecha}</td>
+                        <td class="fw-bold text-dark">${item.hora}</td>
+                        <td>
+                            <button class="btn btn-outline-danger btn-sm" onclick="eliminar(${index})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function eliminar(index) {
+            let db = JSON.parse(localStorage.getItem('reservas'));
+            db.splice(index, 1);
+            localStorage.setItem('reservas', JSON.stringify(db));
+            cargarDatos();
+        }
+
+        function borrarTodo() {
+            if(confirm("¿Seguro que quieres borrar todos los datos?")) {
+                localStorage.removeItem('reservas');
+                cargarDatos();
+            }
+        }
+
+        window.onload = cargarDatos;
+    </script>
+</body>
+</html>
